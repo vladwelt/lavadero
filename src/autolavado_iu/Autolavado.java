@@ -15,7 +15,8 @@ public class Autolavado extends JFrame{
 	Autolavado auto = new Autolavado(); 
 	}
         
-        Timer timer;
+        ArrayList<Timer> timer;
+        Timer llegada;
         Equipo equipo;
 	Terreno terreno;
         //----------------------------------
@@ -23,28 +24,28 @@ public class Autolavado extends JFrame{
         private JLabel areaReportes1;
         private JScrollPane areaReportes;
         private JTextArea reportes;
-        private int p=0;
-        
         //-----------------------------------
         
 	private JMenuBar barra;
-	private JMenu menuOpciones;
+	private JMenu menuArchivo;
+        private JMenu menuEditar;
 	private JMenu menuIrA;
 	private JMenu menuTutorial;
         private JMenu menuSimular;
 	
-	private JMenu menuNuevo;
-	private JMenuItem itemJugar;
-	private JMenuItem itemCrear;
+//	private JMenu menuNuevo;
+	private JMenuItem itemReiniciar;
+	private JMenuItem itemBorrar;
 	
 	public JMenuItem itemCargar;
 	public JMenuItem itemGuardar;
-	private JMenuItem itemPuntaje;
 	private JMenuItem itemSalir;
 	
 	private JMenuItem itemMazeM;
-	private JMenuItem itemMazeD;
         private JMenuItem itemReportes;
+        private JMenu itemEstadisticas;
+        private JMenuItem itemEstadisticasTorta;
+        private JMenuItem itemEstadisticasBarras;
 	
 	private JMenu menuAyuda;
 	private JMenuItem itemAyudaMM;
@@ -52,14 +53,35 @@ public class Autolavado extends JFrame{
 	private JMenuItem itemAyudaMD;
 	
         private JMenuItem itemPlay;
-        private JMenuItem itemPause;
+        private JMenuItem itemAv;
         private JMenuItem itemStop;
 	private JMenuItem itemReglas;
 	private JMenuItem itemCredito;
         
         private Diseño_Terreno disenio;
         private ArrayList<Dimension> ruta;
-	
+        private int aux2=0;
+        private ArrayList <temporizador> clientes;
+        private int intervalo;
+	private int cant=0;
+        private int velocidad;
+        private Cliente cliente;
+        private Vehiculo vehiculo;
+        private ArrayList<String> veh;
+        private ArrayList<String> cli;
+        
+//        ---------------------------------------------------------------
+        private int distribucion_tc;
+        private int distribucion_tv;
+        private int distribucion_tl;
+        private int media_tc;
+        private int media_tv;
+        private int media_tl;
+        private int desvio_tc;
+        private int desvio_tv;
+        private int desvio_tl;
+//        ----------------------------------------------------------
+        
 	public Autolavado(){
                 Menu();
 		iniciarReportes();	
@@ -71,50 +93,47 @@ public class Autolavado extends JFrame{
 		this.setLocation((int)dim.getWidth()/2 -ancho/2 ,(int)dim.getHeight()/2-alto/2);
 		this.setTitle("AutoLavado");
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+                timer= new ArrayList<Timer>();
+                cliente = new Cliente();
+                vehiculo = new Vehiculo();
 		cargarMM();
-                timer = new Timer(1000, new ActionListener() {
-                    
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        if(p==ruta.size()-1)
-                            timer.stop();
-                        if(p!=0)
-                            disenio.getPanelAutolavado().remarcar((int)ruta.get(p-1).getWidth(),(int)ruta.get(p-1).getHeight());
-                        disenio.getPanelAutolavado().marcar((int)ruta.get(p).getWidth(),(int)ruta.get(p).getHeight());
-                        p++;
-                    }
-                });
+                habilitarCargarGardar();
 		this.setVisible(true);
 	}
 
 	private void Menu(){
 		barra = new JMenuBar();
 		
-		menuOpciones = new JMenu("Archivo");
+		menuArchivo = new JMenu("Archivo");
 		menuTutorial = new JMenu("Tutorial");
 		menuIrA = new JMenu("Ir A");
+                menuEditar = new JMenu("Editar");
 		
 		
-		menuNuevo = new JMenu("Nuevo");
+//		menuNuevo = new JMenu("Nuevo");
 		itemCargar = new JMenuItem("Cargar");
 		itemCargar.setEnabled(false);
+                itemCargar.addActionListener(new Autolavado.accionesMenu());
                 itemGuardar = new JMenuItem("Guardar");
                 itemGuardar.setEnabled(false);
-                itemPuntaje = new JMenuItem("Puntaje");
+                itemGuardar.addActionListener(new Autolavado.accionesMenu());
                 itemSalir = new JMenuItem("Salir");
                 itemSalir.addActionListener(new Autolavado.accionesMenu());
-                itemJugar = new JMenuItem("jugar");
-                itemJugar.addActionListener(new Autolavado.accionesMenu());
-                itemCrear = new JMenuItem("crear");
-                itemCrear.addActionListener(new Autolavado.accionesMenu());
+                itemReiniciar = new JMenuItem("Reiniciar");
+                itemReiniciar.addActionListener(new Autolavado.accionesMenu());
+                itemBorrar = new JMenuItem("Borrar");
+                itemBorrar.addActionListener(new Autolavado.accionesMenu());
 
                 itemMazeM = new JMenuItem("Maze Maker");
                 itemMazeM.addActionListener(new Autolavado.accionesMenu());
-                itemMazeD = new JMenuItem("Maze Designer");
-                itemMazeD.addActionListener(new Autolavado.accionesMenu());
                 
                 itemReportes = new JMenuItem("Reportes");
                 itemReportes.addActionListener(new Autolavado.accionesMenu());
+                itemEstadisticas = new JMenu("Mostrar Graficos");
+                itemEstadisticasTorta = new JMenuItem("Tipo Torta");
+                itemEstadisticasBarras = new JMenuItem("Tipo Barras");
+                itemEstadisticasTorta.addActionListener(new Autolavado.accionesMenu());
+                itemEstadisticasBarras.addActionListener(new Autolavado.accionesMenu());
 
                 menuAyuda = new JMenu("Ayuda");
                 itemAyudaMM = new JMenuItem("Maze Maker");
@@ -127,22 +146,22 @@ public class Autolavado extends JFrame{
                 menuSimular = new JMenu("Simular");
                 itemPlay = new JMenuItem("Simular");
                 itemPlay.addActionListener(new Autolavado.accionesMenu());
-                itemPause = new JMenuItem("Pausar");
                 itemStop = new JMenuItem("Parar");
+                itemStop.addActionListener(new Autolavado.accionesMenu());
+                itemAv = new JMenuItem("Acelerar");
+                itemAv.addActionListener(new Autolavado.accionesMenu());
+                menuSimular.add(itemAv);
                 menuSimular.add(itemPlay);
-                menuSimular.add(itemPause);
                 menuSimular.add(itemStop);
                 
-		menuOpciones.add(menuNuevo);
-		menuOpciones.add(itemCargar);
-		menuOpciones.add(itemGuardar);
-//		menuOpciones.add(itemPuntaje);
-		menuOpciones.add(itemSalir);
-//		menuNuevo.add(itemJugar);
-//		menuNuevo.add(itemCrear);
-		
-		menuIrA.add(itemMazeM);
-		menuIrA.add(itemMazeD);
+		menuArchivo.add(itemReiniciar);
+		menuArchivo.add(itemCargar);
+		menuArchivo.add(itemGuardar);
+		menuArchivo.add(itemSalir);
+                menuEditar.add(itemBorrar);
+                menuIrA.add(itemEstadisticas);
+                itemEstadisticas.add(itemEstadisticasTorta);
+                itemEstadisticas.add(itemEstadisticasBarras);
                 menuIrA.add(itemReportes);
 		
 		menuTutorial.add(menuAyuda);
@@ -151,7 +170,8 @@ public class Autolavado extends JFrame{
 		menuAyuda.add(itemAyudaMM);
 		menuAyuda.add(itemAyudaMP);
 		menuAyuda.add(itemAyudaMD);
-		barra.add(menuOpciones);
+		barra.add(menuArchivo);
+                barra.add(menuEditar);
 		barra.add(menuIrA);
                 barra.add(menuSimular);
 		barra.add(menuTutorial);
@@ -162,17 +182,20 @@ public class Autolavado extends JFrame{
 
 		@Override
 		public void actionPerformed(ActionEvent itemMenu) {
+                        if(itemMenu.getSource()==itemGuardar){
+				disenio.getPanelAutolavado().Guardar();
+			}
+                        if(itemMenu.getSource()==itemCargar){
+				disenio.getPanelAutolavado().Cargar();
+			}
+                        if(itemMenu.getSource()==itemReiniciar){
+				cargarMM();
+			}
 			if(itemMenu.getSource()==itemSalir){
 				System.exit(0);
 			}
-			if(itemMenu.getSource() == itemCrear){
+			if(itemMenu.getSource() == itemBorrar){
 				cargarMD();
-			}
-			if(itemMenu.getSource() == itemMazeD){
-				cargarMD();
-			}
-			if(itemMenu.getSource()== itemMazeM){
-				cargarMM();
 			}
 			if(itemMenu.getSource()== itemAyudaMP){
 				File ayuda=new File("MPTUTO.pdf");
@@ -182,6 +205,18 @@ public class Autolavado extends JFrame{
                         }
                         if(itemMenu.getSource()==itemPlay){
                                 simular();
+                        }
+                        if(itemMenu.getSource()==itemStop){
+                                detener();
+                        }
+                        if(itemMenu.getSource()==itemAv){
+                                Avanzar();
+                        }
+                        if(itemMenu.getSource()==itemEstadisticasBarras){
+                                mostrarEstadisticasTipoBarras();
+                        }
+                        if(itemMenu.getSource()==itemEstadisticasTorta){
+                                mostrarEstadisticasTipoTorta();
                         }
 		}
 		
@@ -233,23 +268,136 @@ public class Autolavado extends JFrame{
         }
         
         public void simular(){
-            p = 0;
-            if(disenio.getPanelAutolavado().hayTerreno()){
-                darReporte("El trafico local es "+terreno.traficoLocal(50, 0.3));
-                darReporte("La cantidad de clientes es: "+terreno.cantidadClientes(60));
-                darReporte("El intervalo  de llegadas es: "+terreno.intervaloDeLlegadas(60));
-                darReporte("El tamaño de estacionamiento es : "+ terreno.tamanoDeEstacionamiento(equipo));
-                darReporte("La capacidad de Estacionamientos es : "+ terreno.capacidadDeEstacionamientos(equipo));
-                darReporte("La capacidad de Lavaderos es : "+ terreno.capacidadDeLavaderos(equipo));
-                darReporte((terreno.getAlto_usoComercial())? "Es de uso Comercial":"");
-                disenio.getPanelAutolavado().getDisenio().camino();
-                disenio.getPanelAutolavado().marcar(3,4);
+            if(disenio.getPanelAutolavado().hayTerreno()){                
                 ruta = terreno.camino();
-                timer.start();
+                if(ruta.size()<=1){
+                    JOptionPane.showMessageDialog(this, "ERROR!!!!"
+                                                        + "\n Su diseño es incorrecto"
+                                                        + "\nPosibles causas:"
+                                                        + "\n-Falta de una Entrada"
+                                                        + "\n-Su Asfaltos no coinciden"
+                                                        + "\n-Falta de una Salida"
+                                                       ,"Simular",JOptionPane.ERROR_MESSAGE);
+                    
+                }
+                else{
+                    darReporte("El trafico local es "+terreno.traficoLocal(50, 0.3));
+                    darReporte("La cantidad de clientes es: "+terreno.cantidadClientes(60));
+                    intervalo = (int)terreno.intervaloDeLlegadas(60);
+                    darReporte("El intervalo  de llegadas es: "+intervalo);
+                    darReporte("El tamaño de estacionamiento es : "+ terreno.tamanoDeEstacionamiento(equipo));
+                    darReporte("La capacidad de Estacionamientos es : "+ terreno.capacidadDeEstacionamientos(equipo));
+                    darReporte("La capacidad de Lavaderos es : "+ terreno.capacidadDeLavaderos(equipo));
+                    darReporte((terreno.getAlto_usoComercial())? "Es de uso Comercial":"");
+                    ejecutar();
+                }
             }
         }
         
-        public void mover(){
-            
+        public void ejecutar() {
+            velocidad = 10;
+            if (cant == 0) {
+                cant = terreno.cantidadClientes(60);
+                veh = vehiculo.tipoVehiculo(cant);
+                cli = cliente.tipoCliente(cant);
+            }
+            clientes = new ArrayList<temporizador>();
+            final int r = 0;
+            llegada = new Timer(intervalo * 1000, new ActionListener() {
+                int i = 1;
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (i == cant + 1) {
+                        llegada.stop();
+                    }
+                    temporizador t = new temporizador(velocidad, terreno, disenio, i, Autolavado.this,veh.get(i),cli.get(i));
+                    clientes.add(t);
+                    i++;
+                }
+            });
+            llegada.start();
+        }
+        public void avanzar(){
+            velocidad = (int)(velocidad*0.5);
+            try{
+            llegada.stop();
+            }
+            catch(Exception ex){
+                
+            }
+            clientes.clear();
+            intervalo = (int)(intervalo*0.5);
+            llegada = new Timer(intervalo*1000, new ActionListener() {
+                    int i=1;
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        if(i==cant+1){
+                            llegada.stop();
+                        }
+                        temporizador t = new temporizador(velocidad,terreno,disenio,i, Autolavado.this,veh.get(i),cli.get(i));
+                        clientes.add(t);
+                        i++;
+                    }
+                });
+                llegada.start();
+        }
+        
+        public void detener(){
+            if(llegada.isRunning()){
+            llegada.stop();
+            for(int i=0;i<clientes.size();i++){
+                clientes.get(i).cancelar();
+            }
+            }
+        }
+        public void Avanzar(){
+            if(llegada.isRunning()){
+                for(int i=0;i<clientes.size();i++){
+//                    if(clientes.get(i).)
+                    clientes.get(i).controlar();
+                }
+                avanzar();  
+            }
+        }
+        public void mostrarEstadisticasTipoTorta(){
+            Torta client = new Torta(100,100,"Tipo de Clientes","Socio","No Socio",cliente.getSocio(),cliente.getNormal());
+            Torta vehic = new Torta(100,370,"Tipo de Vehiculos","Auto Normal","Camioneta",vehiculo.getAuto(),vehiculo.getCamioneta());
+        }
+        public void mostrarEstadisticasTipoBarras(){
+            Barras c = new Barras(200,100,"Clientes","Socio","No Socio",cliente.getSocio(),cliente.getNormal(),"Numero de Clientes","Tipo de Clientes");
+            Barras v = new Barras(200,370,"Vehiculos","Auto Normal","Camioneta",vehiculo.getAuto(),vehiculo.getCamioneta(),"Numero de Vehiculos","Tipo de Vehiculos");
+        }
+        public void cambiarCliente(int cambio,String media,String desvio){
+            cliente.setDistribucion(cambio);
+            double me=Double.parseDouble(media);
+            if(me<8)
+                me = 8;
+            cliente.setMedia(me);
+            double de=Double.parseDouble(desvio);
+            if(de<8)
+            cliente.setDesvio(de);
+        }
+        public void cambiarVehiculo(int cambio,String media,String desvio){
+            vehiculo.setDistribucion(cambio);
+            double me=Double.parseDouble(media);
+            if(me<8)
+                me=8;
+            vehiculo.setMedia(me);
+            double de=Double.parseDouble(desvio);
+            if(de<8)
+                de=8;
+            vehiculo.setDesvio(de);
+        }
+        public void cambiarIntervalo(int cambio,String media,String desvio){
+            terreno.setDistribucion(cambio);
+            double me=Double.parseDouble(media);
+            if(me<8)
+                me=8;
+            terreno.setMedia(me);
+            double de=Double.parseDouble(desvio);
+            if(de<8)
+                de=8;
+            terreno.setDesvio(de);
+
         }
 }

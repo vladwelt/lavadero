@@ -12,10 +12,39 @@ public class Diseño_Terreno extends JPanel implements MouseInputListener, Actio
   
 
 	private static final long serialVersionUID = 1L;
+        
+         private JPanel panelParametros;
+        
+        String dis1 = "exponencial";
+        String dis2 = "normal";
+            
+        private JLabel tipo_cli;
+        private JLabel tipo_veh;
+        private JLabel tmpo_lleg;
+        private JComboBox distribucion_tc;
+        private JComboBox distribucion_tv;
+        private JComboBox distribucion_tl;
+        private JTextField media_tc;
+        private JTextField media_tv;
+        private JTextField media_tl;
+        private JTextField desvio_tc;
+        private JTextField desvio_tv;
+        private JTextField desvio_tl; 
+        private JButton boton_asignar;
+        
+        int media_tipocliente;
+        int media_tipovehiculo;
+        int media_tiempollegadas;
+        int desvio_tipocliente;
+        int desvio_tipovehiculo;
+        int desvio_tiempollegadas;
+        String distribucion_tipocliente;
+        String distribucion_tipovehiculo;
+        String distribucion_tiempollegadas;
 	
 	JTextField filas = new JTextField();
 	JTextField columnas = new JTextField();
-	JButton btnOK = new JButton("OK");
+//	JButton btnOK = new JButton("OK");
 	
 	private JFrame Padre;
 	
@@ -27,6 +56,7 @@ public class Diseño_Terreno extends JPanel implements MouseInputListener, Actio
 	
 //Botones para el panel Maze
 	private JButton btnPlay;
+        private JButton btnStop;
 	
 	private JButton btnCrear;
 	
@@ -88,6 +118,7 @@ public class Diseño_Terreno extends JPanel implements MouseInputListener, Actio
 		OpcionesDesigner();
 		addPanelTools();
                 addPanelAsfaltos();
+                addParametros();
 		
 		this.add(lblBGMD);
 		this.setVisible(true);
@@ -103,6 +134,11 @@ public class Diseño_Terreno extends JPanel implements MouseInputListener, Actio
 		btnPlay.addActionListener(this);
 		this.add(btnPlay);
 		
+                btnStop = new JButton("Detener");
+		btnStop.setBounds(150,Y,100,20);
+		btnStop.addActionListener(this);
+		this.add(btnStop);
+                
 		filas.setBounds(860, Y-20, 50, 20);
 		this.add(filas);
 		
@@ -115,6 +151,83 @@ public class Diseño_Terreno extends JPanel implements MouseInputListener, Actio
 		btnCrear.addActionListener(this);
 		this.add(btnCrear);
 	}
+        private void addParametros(){
+		panelParametros = new JPanel();
+		panelParametros.setBounds(1065,330,185,330);
+		panelParametros.setLayout(null);
+		panelParametros.setOpaque(false);
+		panelParametros.setBorder(BorderFactory.createTitledBorder("Parametros"));
+		//Añadimos las herramientas al panel
+                addParams();
+		//Añadimos el panel a la ventana
+		add(panelParametros);
+               
+                
+	}
+        private void addParams(){
+           
+            boton_asignar = new JButton("ASIGNAR");
+            boton_asignar.setBounds(50, 290, 85, 20);
+            boton_asignar.addActionListener(this);
+            
+                tipo_cli = new JLabel("TIPO DE CLIENTE:");
+                tipo_cli.setBounds(10, 10, 100, 40);
+                media_tc = new JTextField("media");
+                media_tc.setBounds(10, 75, 80, 20);
+                desvio_tc = new JTextField("desvio");
+                desvio_tc.setBounds(95, 75, 80, 20);
+                JLabel lbdistribucion1 = new JLabel("Distribucion: ");
+                lbdistribucion1.setBounds(10, 45, 80, 20);
+                distribucion_tc= new JComboBox();
+                distribucion_tc.addItem(dis1);
+                distribucion_tc.addItem(dis2);
+                distribucion_tc.setBounds(90, 45, 80, 20);
+                
+                tipo_veh = new JLabel("TIPO DE VEHICULO:");
+                tipo_veh.setBounds(10, 100, 120, 40);
+                media_tv = new JTextField("media");
+                media_tv.setBounds(10, 165, 80, 20);
+                desvio_tv = new JTextField("desvio");
+                desvio_tv.setBounds(95, 165, 80, 20);
+                JLabel lbdistribucion2 = new JLabel("Distribucion: ");
+                lbdistribucion2.setBounds(10, 135, 80, 20);
+                distribucion_tv= new JComboBox();
+                distribucion_tv.addItem(dis1);
+                distribucion_tv.addItem(dis2);
+                distribucion_tv.setBounds(90, 135, 80, 20);
+                
+                tmpo_lleg = new JLabel("INTERVALO DE LLEGADAS:");
+                tmpo_lleg.setBounds(10, 190, 160, 40);
+                media_tl = new JTextField("media");
+                media_tl.setBounds(10, 255, 80, 20);
+                desvio_tl= new JTextField("desvio");
+                desvio_tl.setBounds(95, 255, 80, 20);
+                JLabel lbdistribucion3 = new JLabel("Distribucion: ");
+                lbdistribucion3.setBounds(10, 225, 80, 20);
+                distribucion_tl= new JComboBox();
+                distribucion_tl.addItem(dis1);
+                distribucion_tl.addItem(dis2);
+                distribucion_tl.setBounds(90, 225, 80, 20);
+                
+                panelParametros.add(tipo_cli);
+                panelParametros.add(tipo_veh);
+                panelParametros.add(tmpo_lleg);
+                panelParametros.add(media_tc);
+                panelParametros.add(media_tv);
+                panelParametros.add(media_tl);
+                panelParametros.add(desvio_tc);
+                panelParametros.add(desvio_tv);
+                panelParametros.add(desvio_tl);
+                panelParametros.add(distribucion_tc);
+                panelParametros.add(lbdistribucion1);
+                panelParametros.add(distribucion_tv);
+                panelParametros.add(lbdistribucion2);
+                panelParametros.add(distribucion_tl);
+                panelParametros.add(lbdistribucion3);
+                
+                panelParametros.add(boton_asignar);
+        }
+
 	
     ////////PANEL TOOL//////////
 	private void addPanelTools(){
@@ -222,8 +335,8 @@ public class Diseño_Terreno extends JPanel implements MouseInputListener, Actio
         private void addPanelAsfaltos(){
 		
                 panelAsfaltos = new JPanel();
-                panelAsfaltos.setBounds(1060,30,195,535);
-		panelAsfaltos.setLayout(null);
+		panelAsfaltos.setLayout(null);                panelAsfaltos.setBounds(1060,30,195,300);
+
 		panelAsfaltos.setOpaque(false);
 		panelAsfaltos.setBorder(BorderFactory.createTitledBorder("Asfaltos"));
 		//A�adimos las herramientas al panel
@@ -703,6 +816,23 @@ public class Diseño_Terreno extends JPanel implements MouseInputListener, Actio
                  if(onClicked.getSource() == btnPlay){
                      ((Autolavado)Padre).simular();
 //                     panelDesigner.getDisenio().Mostrar();
+                 }
+                 if(onClicked.getSource() == btnStop){
+                     ((Autolavado)Padre).detener();
+                 }
+                 if(onClicked.getSource()== boton_asignar){
+//                     private JComboBox distribucion_tc;
+//                        private JComboBox distribucion_tv;
+//        private JComboBox distribucion_tl;
+//        private JTextField media_tc;
+//        private JTextField media_tv;
+//        private JTextField media_tl;
+//        private JTextField desvio_tc;
+//        private JTextField desvio_tv;
+//        private JTextField desvio_tl; 
+                     ((Autolavado)Padre).cambiarCliente(distribucion_tc.getSelectedIndex(),media_tc.getText(),desvio_tc.getText());
+                     ((Autolavado)Padre).cambiarVehiculo(distribucion_tv.getSelectedIndex(),media_tv.getText(),desvio_tv.getText());
+                     ((Autolavado)Padre).cambiarIntervalo(distribucion_tl.getSelectedIndex(),media_tl.getText(),desvio_tl.getText());
                  }
 //        if(onClicked.getSource() == btnPlay){
 //                    Terreno terr = panelDesigner.getDisenio();

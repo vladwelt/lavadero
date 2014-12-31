@@ -9,12 +9,6 @@ package autolavado_iu;
  * @author jimena
  */
 public class Generador {
-
-    /**
-     * @param args the command line arguments
-     */
-    
-    
     
     public double exponencial(double media){
 

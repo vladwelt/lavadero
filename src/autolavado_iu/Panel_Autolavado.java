@@ -1,10 +1,11 @@
 package autolavado_iu;
 
 import java.io.File;
+import java.util.ArrayList;
 import javax.swing.*;
 
 public class Panel_Autolavado extends JPanel{
-
+    
 	private Terreno terreno;
 	private boolean hayTerreno = false;
 	private JLabel[][] lblMaze;
@@ -18,7 +19,7 @@ public class Panel_Autolavado extends JPanel{
         private ImageIcon Esta = new ImageIcon(a+"estacionam.jpg");
         private ImageIcon Asfa1 = new ImageIcon(a+"asfalto.jpg");
         private ImageIcon Asfa2 = new ImageIcon(a+"asfalto2.jpg");
-        
+        private ImageIcon Auto = new ImageIcon(a+"coche.jpg");
 	private ImageIcon Entrada = new ImageIcon(b+"Entrada.jpg");
 	private ImageIcon Salida = new ImageIcon(b+"Salida.jpg");
 	
@@ -76,7 +77,11 @@ public class Panel_Autolavado extends JPanel{
 					
 					if(terreno.esEntrada(f, c)) lblMaze[f][c].setIcon(Entrada);
 					if(terreno.esSalida(f, c)) lblMaze[f][c].setIcon(Salida);
-				}
+                                        if(terreno.esTrayecto(f, c)) lblMaze[f][c].setIcon(Asfa2);
+                                        if(terreno.esTunel(f, c)) lblMaze[f][c].setIcon(Tunel);
+                                        if(terreno.esAsfalto(f, c)) lblMaze[f][c].setIcon(Asfa1);
+                                        if(terreno.esEsta(f, c)) lblMaze[f][c].setIcon(Esta);
+                                }
 			}
 			repaint();
 		}
@@ -249,8 +254,14 @@ public class Panel_Autolavado extends JPanel{
 	 		}
  		}
 	 }
-        public void marcar(int i,int j){
+        public void ponerEntrada(int i , int j){
             lblMaze[i][j].setIcon(Entrada);
+        }
+        public void ponerSalida(int i , int j){
+            lblMaze[i][j].setIcon(Salida);
+        }
+        public void marcar(int i,int j){
+            lblMaze[i][j].setIcon(Auto);
         }
         public void remarcar(int i,int j){
             lblMaze[i][j].setIcon(Asfa2);
@@ -261,4 +272,18 @@ public class Panel_Autolavado extends JPanel{
 		return terreno; 
 	}
         
+        protected void Guardar(){if(hayTerreno)terreno.SaveMaze();}
+	
+        protected void Cargar(){
+            terreno.OpenMaze();
+            if(!hayTerreno){
+		if(terreno.abrioTerreno())CrearTerreno(terreno.getTotalFilas(), terreno.getTotalColumnas(), false);
+            }
+            else{
+                if(terreno.abrioTerreno()){
+                    EliminarTerreno();	
+                    CrearTerreno(terreno.getTotalFilas(), terreno.getTotalColumnas(), false);
+		}
+            }
+	}
 }
